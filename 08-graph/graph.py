@@ -1,3 +1,4 @@
+from queue import PriorityQueue
 
 class Graph:
     def __init__(self) -> None:
@@ -22,7 +23,7 @@ class Graph:
 
     def display(self):
         for v in self.vertices:
-            print(v, end='. ')
+            print(v, "(", self.vertices[v].distance, ")", end='. ')
             print('Edges: ', end='')
             for e in self.vertices[v].edges:
                 edge = self.vertices[v].edges[e]
@@ -61,6 +62,26 @@ class Graph:
             return
         self.path += str(dest) + ' ' 
 
+    def relax(self, va, vb, w):
+        if vb.distance > va.distance + w:
+            vb.distance = va.distance + w
+            vb.parent = va
+
+    def dijkstra(self, start):
+        for v in self.vertices:
+            self.vertices[v].init_bfs()
+        self.vertices[start].distance = 0
+        Q = []
+        for vertex in self.vertices:
+            Q.append(self.vertices[vertex])
+        Q.sort(key=lambda x : x.distance)
+        while(len(Q) > 0):
+            u = Q.pop(0)
+            for edge in u.edges:
+                v = self.vertices[edge]
+                w = u.edges[edge].weight
+                self.relax(u, v, w)
+            Q.sort(key=lambda x : x.distance)
 
 
 
@@ -69,7 +90,7 @@ class Vertex:
     def __init__(self, id) -> None:
         self.id = id
         self.edges = {}
-        # These variables below used for BFS
+        # These variables below used for BFS and Dijkstra
         self.distance = 0
         self.color = 'white'
         self.parent = None
@@ -89,34 +110,62 @@ class Edge:
         self.weight = weight
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     g = Graph()
-    g.add_vertex('a')
-    g.add_vertex('b')
-    g.add_vertex('c')
-    g.add_vertex('d')
-    g.add_vertex('e')
-    g.add_vertex('f')
-    g.add_vertex('g')
-    g.add_vertex('h')
-    g.add_vertex('i')
-    g.add_edge('a', 'b')
-    g.add_edge('a', 'e')
-    g.add_edge('a', 'd')
-    g.add_edge('a', 'f')
-    g.add_edge('b', 'g')
-    g.add_edge('b', 'c')
-    g.add_edge('b', 'e')
-    g.add_edge('c', 'g')
-    g.add_edge('c', 'e')
-    g.add_edge('d', 'e')
-    g.add_edge('e', 'f')
-    g.add_edge('f', 'g')
-    g.add_edge('h', 'i')
-    g.display()
-    g.bfs('a')
-    g.print_shortest_path('a', 'g')
+    g.directed = True
+    vertices = ['A','B','C','D','G','F','H','J','K', 'X']
+    for v in vertices:
+        g.add_vertex(v)
+    g.add_edge('A', 'B', 3)
+    g.add_edge('A', 'C', 5)
+    g.add_edge('B', 'D', 4)
+    g.add_edge('B', 'G', 7)
+    g.add_edge('C', 'F', 1)
+    g.add_edge('G', 'H', 3)
+    g.add_edge('G', 'F', 4)
+    g.add_edge('F', 'H', 2)
+    g.add_edge('F', 'J', 6)
+    g.add_edge('H', 'D', 3)
+    g.add_edge('H', 'J', 5)
+    g.add_edge('D', 'K', 6)
+    g.add_edge('D', 'J', 2)
+    g.add_edge('D', 'H', 2)
+    g.add_edge('J', 'K', 2)
+    # g.display()
+    g.dijkstra('A')
+    # g.display()
+    g.print_shortest_path('A', 'X')
     print(g.path)
+
+
+# if __name__ == '__main__':
+#     g = Graph()
+#     g.add_vertex('a')
+#     g.add_vertex('b')
+#     g.add_vertex('c')
+#     g.add_vertex('d')
+#     g.add_vertex('e')
+#     g.add_vertex('f')
+#     g.add_vertex('g')
+#     g.add_vertex('h')
+#     g.add_vertex('i')
+#     g.add_edge('a', 'b')
+#     g.add_edge('a', 'e')
+#     g.add_edge('a', 'd')
+#     g.add_edge('a', 'f')
+#     g.add_edge('b', 'g')
+#     g.add_edge('b', 'c')
+#     g.add_edge('b', 'e')
+#     g.add_edge('c', 'g')
+#     g.add_edge('c', 'e')
+#     g.add_edge('d', 'e')
+#     g.add_edge('e', 'f')
+#     g.add_edge('f', 'g')
+#     g.add_edge('h', 'i')
+#     g.display()
+#     g.bfs('a')
+#     g.print_shortest_path('a', 'g')
+#     print(g.path)
 
 
     # graph1 = Graph()
