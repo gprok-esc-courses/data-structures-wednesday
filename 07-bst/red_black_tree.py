@@ -5,12 +5,13 @@ class TreeNode:
         self.parent = None
         self.left = None
         self.right = None 
+        self.color = 'red'
 
     def __str__(self) -> str:
         return str(self.value)
 
 
-class BinarySearchTree:
+class RedBlackTree:
     def __init__(self) -> None:
         self.root = None 
 
@@ -39,6 +40,70 @@ class BinarySearchTree:
                         added = True
                     else:
                         temp = temp.left
+        self.insert_fixup(node)
+
+    def left_rotate(self, x):
+        y = x.right
+        x.right = y.left
+        if y.left is not None:
+            y.left.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y 
+        elif x == x.parent.left:
+            x.parent.left = y
+        else:
+            x.parent.right = y
+        y.left = x
+        x.parent = y 
+
+    def right_rotate(self, x):
+        y = x.left
+        x.left = y.right
+        if y.right is not None:
+            y.right.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y 
+        elif x == x.parent.left:
+            x.parent.left = y
+        else:
+            x.parent.right = y
+        y.right = x
+        x.parent = y 
+
+
+    def insert_fixup(self, z):
+        while z.parent is not None and z.parent.color == 'red':
+            if z.parent == z.parent.parent.left:
+                y = z.parent.parent.right
+                if y is not None and y.color == 'red':      # Case 1
+                    z.parent.color = 'black'
+                    y.color = 'black'
+                    z.parent.parent.color = 'red'
+                    z = z.parent.parent
+                elif z == z.parent.right:                   # Case 2
+                    z = z.parent
+                    self.left_rotate(z)
+                else:                                       # Case 3
+                    z.parent.color = 'black'
+                    z.parent.parent.color = 'red'
+                    self.right_rotate(z.parent.parent)
+            else:  # parent is right child of grandparent
+                y = z.parent.parent.left
+                if y is not None and y.color == 'red':      # Case 1
+                    z.parent.color = 'black'
+                    y.color = 'black'
+                    z.parent.parent.color = 'red'
+                    z = z.parent.parent
+                elif z == z.parent.left:                   # Case 2
+                    z = z.parent
+                    self.right_rotate(z)
+                else:                                       # Case 3
+                    z.parent.color = 'black'
+                    z.parent.parent.color = 'red'
+                    self.left_rotate(z.parent.parent)
+        self.root.color = 'black'
 
     def inorder(self):
         stack = []
@@ -130,20 +195,23 @@ class BinarySearchTree:
 
 
 if __name__ == "__main__":
-    bst = BinarySearchTree()
-    bst.add(35)
-    bst.add(46)
-    bst.add(12)
-    bst.add(100)
-    bst.add(11)
-    bst.add(3)
-    bst.add(38)
-    bst.add(32)
+    bst = RedBlackTree()
+    # bst.add(35)
+    # bst.add(46)
+    # bst.add(12)
+    # bst.add(100)
+    # bst.add(11)
+    # bst.add(3)
+    # bst.add(38)
+    # bst.add(32)
+    for i in range(4000000):
+        bst.add(i)
 
     print("Height:", bst.height(bst.root))
+    print("Root:", bst.root.value)
 
     # bst.remove(35)
-    bst.inorder_recursive(bst.root)
+    # bst.inorder_recursive(bst.root)
 
     # n = bst.find(11)
     # print(n)
